@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.blueoptima.ratelimiter.rateannotation.RedisLimiterProperties;
+import com.blueoptima.ratelimiter.rateannotation.RedisProperties;
 import com.blueoptima.ratelimiter.rateannotation.event.RateCheckFailureEvent;
 
 import org.springframework.context.ApplicationContext;
@@ -15,12 +15,12 @@ import org.springframework.context.ApplicationContextAware;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class RateCheckTaskRunner implements ApplicationContextAware {
+public final class RateCheckCallableTask implements ApplicationContextAware {
     private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    private final RedisRateLimiterFactory redisRateLimiterFactory;
+    private final RedisRateFactory redisRateLimiterFactory;
 
-    private final RedisLimiterProperties redisLimiterProperties;
+    private final RedisProperties redisLimiterProperties;
 
     private ApplicationContext applicationContext;
 

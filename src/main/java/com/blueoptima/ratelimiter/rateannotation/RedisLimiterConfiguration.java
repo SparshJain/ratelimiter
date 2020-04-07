@@ -1,31 +1,34 @@
 package com.blueoptima.ratelimiter.rateannotation;
 
-import com.blueoptima.ratelimiter.rateannotation.core.RateCheckTaskRunner;
-import com.blueoptima.ratelimiter.rateannotation.core.RedisRateLimiterFactory;
-import com.blueoptima.ratelimiter.rateannotation.dynamic.LimiterConfigResource;
-import com.blueoptima.ratelimiter.rateannotation.dynamic.RedisLimiterConfigProcessor;
-import com.blueoptima.ratelimiter.rateannotation.event.DefaultRateCheckFailureListener;
-import com.blueoptima.ratelimiter.rateannotation.event.DefaultRateExceedingListener;
-import com.blueoptima.ratelimiter.rateannotation.event.RateCheckFailureListener;
-import com.blueoptima.ratelimiter.rateannotation.event.RateExceedingListener;
-import com.blueoptima.ratelimiter.rateannotation.web.RateCheckInterceptor;
-import com.blueoptima.ratelimiter.rateannotation.web.RateLimiterWebMvcConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.blueoptima.ratelimiter.rateannotation.core.RateCheckCallableTask;
+import com.blueoptima.ratelimiter.rateannotation.core.RedisRateFactory;
+import com.blueoptima.ratelimiter.rateannotation.dynamic.LimiterConfig;
+import com.blueoptima.ratelimiter.rateannotation.dynamic.LimiterConfigurationController;
+import com.blueoptima.ratelimiter.rateannotation.dynamic.ReddisProcessor;
+import com.blueoptima.ratelimiter.rateannotation.event.DefaultRateCheckFailureListener;
+import com.blueoptima.ratelimiter.rateannotation.event.DefaultRateExceedingListener;
+import com.blueoptima.ratelimiter.rateannotation.event.RateCheckFailureListener;
+import com.blueoptima.ratelimiter.rateannotation.event.RateExceedingListener;
+import com.blueoptima.ratelimiter.rateannotation.web.RateCheckInterceptor;
+import com.blueoptima.ratelimiter.rateannotation.web.RateLimiterWebMvcConfigurer;
+
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 
 @Configuration
-@EnableConfigurationProperties(RedisLimiterProperties.class)
+@EnableConfigurationProperties(RedisProperties.class)
 public class RedisLimiterConfiguration {
 
     @Autowired
-    private RedisLimiterProperties redisLimiterProperties;
+    private RedisProperties redisLimiterProperties;
 
     @Bean
     @ConditionalOnMissingBean(JedisPool.class)
@@ -41,9 +44,9 @@ public class RedisLimiterConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RedisRateLimiterFactory.class)
-    public RedisRateLimiterFactory redisRateLimiterFactory() {
-        RedisRateLimiterFactory redisRateLimiterFactory = new RedisRateLimiterFactory(jedisPool());
+    @ConditionalOnMissingBean(RedisRateFactory.class)
+    public RedisRateFactory redisRateLimiterFactory() {
+    	RedisRateFactory redisRateLimiterFactory = new RedisRateFactory(jedisPool());
         return redisRateLimiterFactory;
     }
 
@@ -67,9 +70,9 @@ public class RedisLimiterConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RateCheckTaskRunner.class)
-    public RateCheckTaskRunner rateCheckTaskRunner() {
-        RateCheckTaskRunner rateCheckTaskRunner = new RateCheckTaskRunner(redisRateLimiterFactory(), redisLimiterProperties);
+    @ConditionalOnMissingBean(RateCheckCallableTask.class)
+    public RateCheckCallableTask rateCheckTaskRunner() {
+    	RateCheckCallableTask rateCheckTaskRunner = new RateCheckCallableTask(redisRateLimiterFactory(), redisLimiterProperties);
         return rateCheckTaskRunner;
     }
 
@@ -88,18 +91,18 @@ public class RedisLimiterConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RedisLimiterConfigProcessor.class)
+    @ConditionalOnMissingBean(ReddisProcessor.class)
     @ConditionalOnProperty(prefix = "spring.redis-limiter", name = "enable-dynamical-conf", havingValue = "true")
-    public RedisLimiterConfigProcessor redisLimiterConfigProcessor() {
-        RedisLimiterConfigProcessor redisLimiterConfigProcessor = new RedisLimiterConfigProcessor(redisLimiterProperties);
+    public ReddisProcessor redisLimiterConfigProcessor() {
+    	ReddisProcessor redisLimiterConfigProcessor = new ReddisProcessor(redisLimiterProperties);
         return redisLimiterConfigProcessor;
     }
 
     @Bean
-    @ConditionalOnMissingBean(LimiterConfigResource.class)
+    @ConditionalOnMissingBean(LimiterConfigurationController.class)
     @ConditionalOnProperty(prefix = "spring.redis-limiter", name = "enable-dynamical-conf", havingValue = "true")
-    public LimiterConfigResource limiterConfigResource() {
-        LimiterConfigResource limiterConfigResource = new LimiterConfigResource(jedisPool(), redisLimiterProperties, redisLimiterConfigProcessor());
+    public LimiterConfigurationController limiterConfigResource() {
+    	LimiterConfigurationController limiterConfigResource = new LimiterConfigurationController(jedisPool(), redisLimiterProperties, redisLimiterConfigProcessor());
         return limiterConfigResource;
     }
 

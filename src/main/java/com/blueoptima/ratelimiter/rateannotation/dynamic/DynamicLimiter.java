@@ -9,7 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target({ METHOD })
-public @interface DynamicRateLimiter {
+public @interface DynamicLimiter {
     String base() default "";
 
     String path() default "";

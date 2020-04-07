@@ -11,7 +11,7 @@ import redis.clients.jedis.JedisPool;
 /**
  * Redis based Rate limiter
  *
- * @author Aiyun Tang <aiyun.tang@gmail.com>
+ * @author sparsh jain
  */
 @RequiredArgsConstructor
 public class RedisRateLimiter {

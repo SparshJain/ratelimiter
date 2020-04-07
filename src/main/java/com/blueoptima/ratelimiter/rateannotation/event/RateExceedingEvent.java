@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationEvent;
 @Data
 public final class RateExceedingEvent extends ApplicationEvent {
     private static Object dummy = new Object();
-    private String applicationName;
     private String controllerName;
     private String methodName;
     private String baseExp;

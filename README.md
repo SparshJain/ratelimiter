@@ -166,7 +166,7 @@ public final class LimiterConfigResource implements InitializingBean, Applicatio
     @GetMapping
     public LimiterConfig get(@RequestParam("controller") String controller, @RequestParam("method")String method) {
         String limiterConfigKey = controller + ":" + method;
-        return redisLimiterConfigProcessor.get(limiterConfigKey);
+        return RedisProcessor.get(limiterConfigKey);
     }
 
     @DeleteMapping

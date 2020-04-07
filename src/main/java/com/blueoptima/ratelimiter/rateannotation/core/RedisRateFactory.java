@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.JedisPool;
 
 @RequiredArgsConstructor
-public final class RedisRateLimiterFactory {
+public final class RedisRateFactory {
 
     private final JedisPool jedisPool;
 
@@ -19,7 +19,7 @@ public final class RedisRateLimiterFactory {
     public RedisRateLimiter get(final TimeUnit timeUnit) {
         RedisRateLimiter redisRateLimiter = redisRateLimiterCache.getIfPresent(timeUnit);
         if(redisRateLimiter == null) {
-            synchronized (RedisRateLimiterFactory.class) {
+            synchronized (RedisRateFactory.class) {
                 redisRateLimiter = redisRateLimiterCache.getIfPresent(timeUnit);
                 if(redisRateLimiter == null) {
                     redisRateLimiter = new RedisRateLimiter(jedisPool, timeUnit);

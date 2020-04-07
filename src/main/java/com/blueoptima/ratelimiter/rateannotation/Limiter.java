@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 @Retention(RUNTIME)
 @Target({ METHOD })
-public @interface RateLimiter {
+public @interface Limiter {
 
     String base() default "";
 
