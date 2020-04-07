@@ -10,7 +10,7 @@ import lombok.Getter;
 @Component
 @ConfigurationProperties("user-based-permits")
 @Getter
-public class UserBasedConfiguration {
+public class PermitsPerUserIdConfiguration {
 	
     private final Map<String, String> userid = new HashMap<>();
 

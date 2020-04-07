@@ -27,7 +27,7 @@ import com.blueoptima.ratelimiter.annotations.GenericLimit;
 import com.blueoptima.ratelimiter.annotations.SpecificLimit;
 import com.blueoptima.ratelimiter.common.RateCheckCallableTask;
 import com.blueoptima.ratelimiter.common.SpecificConfiguration;
-import com.blueoptima.ratelimiter.common.UserBasedConfiguration;
+import com.blueoptima.ratelimiter.common.PermitsPerUserIdConfiguration;
 import com.blueoptima.ratelimiter.listener.RateExceedingEvent;
 import com.blueoptima.ratelimiter.reddis.ReddisProcessor;
 import com.blueoptima.ratelimiter.reddis.RedisProperties;
@@ -45,7 +45,7 @@ public class RateLimiterInterceptor implements HandlerInterceptor, ApplicationCo
 	private ApplicationContext applicationContext;
 
 	@Autowired
-	private UserBasedConfiguration userBasedConfiguration;
+	private PermitsPerUserIdConfiguration userBasedConfiguration;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) {
