@@ -173,8 +173,8 @@ public class RateLimiterInterceptor implements HandlerInterceptor, ApplicationCo
 	}
 
 	private void buildDenyResponse(HttpServletResponse response) throws Exception {
-		response.setStatus(HttpStatus.FORBIDDEN.value());
-		response.getWriter().print("Access denied because of exceeding access rate");
+		response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+		response.getWriter().print("Too many requests");
 	}
 
 	@Override

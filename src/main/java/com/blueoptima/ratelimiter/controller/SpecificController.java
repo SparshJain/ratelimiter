@@ -10,11 +10,11 @@ import com.blueoptima.ratelimiter.annotations.SpecificLimit;
 
 @RestController
 @RequestMapping("/specific")
-public class SpecificTestController {
+public class SpecificController {
     
     @GetMapping("/developers")
     @SpecificLimit(base = "#Headers['userid']", permits = 2, timeUnit = TimeUnit.MINUTES)
-    public String DeveloperAPI() {
+    public String developerAPI() {
         return "Developers API";
     }
     

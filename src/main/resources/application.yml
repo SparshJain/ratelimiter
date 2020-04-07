@@ -8,5 +8,5 @@ spring:
       enable-dynamical-conf: true
 
 user-based-permits:
-  userid.user1: 2
-  userid.user2: 3
+  userid.user1: 5
+  userid.user2: 10
