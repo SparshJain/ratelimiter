@@ -1,10 +1,12 @@
 server:
   port: 8888
+
 spring:
   redis-limiter:
       redis-host: 127.0.0.1
       check-action-timeout: 100
       enable-dynamical-conf: true
+
 user-based-permits:
-  user1: 2
-  user2: 3
+  userid.user1: 2
+  userid.user2: 3

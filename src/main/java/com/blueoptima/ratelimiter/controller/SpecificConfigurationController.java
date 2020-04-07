@@ -1,4 +1,4 @@
-package com.blueoptima.ratelimiter.rateannotation.dynamic;
+package com.blueoptima.ratelimiter.controller;
 
 import java.io.IOException;
 
@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.blueoptima.ratelimiter.rateannotation.RedisProperties;
+import com.blueoptima.ratelimiter.common.SpecificConfiguration;
+import com.blueoptima.ratelimiter.reddis.ReddisProcessor;
+import com.blueoptima.ratelimiter.reddis.RedisProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -22,39 +24,35 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 @RestController
-@RequestMapping("/limiterconfig")
+@RequestMapping("/specificConfig")
 @RequiredArgsConstructor
-public final class LimiterConfigurationController{
-
+public final class SpecificConfigurationController{
     private static Logger logger = LoggerFactory.getLogger(ReddisProcessor.class);
-
     private final JedisPool jedisPool;
-
     private final RedisProperties redisLimiterProperties;
-
     private final ReddisProcessor RedisProcessor;
 
     @PutMapping
-    public void update(@RequestBody LimiterConfig limiterConfig, HttpServletResponse response) throws IOException {
+    public void update(@RequestBody SpecificConfiguration limiterConfig, HttpServletResponse response) throws IOException {
             publish(limiterConfig);
     }
 
     @GetMapping
-    public LimiterConfig get(@RequestParam("controller") String controller, @RequestParam("method")String method) {
+    public SpecificConfiguration get(@RequestParam("controller") String controller, @RequestParam("method")String method) {
         String limiterConfigKey = controller + ":" + method;
         return RedisProcessor.get(limiterConfigKey);
     }
 
     @DeleteMapping
     public void delete(@RequestParam("controller") String controller, @RequestParam("method")String method) {
-        LimiterConfig limiterConfig = new LimiterConfig();
+        SpecificConfiguration limiterConfig = new SpecificConfiguration();
         limiterConfig.setControllerName(controller);
         limiterConfig.setMethodName(method);
         limiterConfig.setDeleted(true);
         publish(limiterConfig);
     }
 
-    private void publish(LimiterConfig limiterConfig) {
+    private void publish(SpecificConfiguration limiterConfig) {
         ObjectMapper objectMapper = new ObjectMapper();
         String configMessage = null;
         try {

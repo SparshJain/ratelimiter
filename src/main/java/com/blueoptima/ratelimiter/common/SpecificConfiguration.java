@@ -1,9 +1,10 @@
-package com.blueoptima.ratelimiter.rateannotation.dynamic;
+package com.blueoptima.ratelimiter.common;
 
 import lombok.Data;
 
 @Data
-public final class LimiterConfig {
+public final class SpecificConfiguration {
+    private String userId;
     private String controllerName;
     private String methodName;
     private String baseExp;

@@ -1,14 +1,15 @@
-package com.blueoptima.ratelimiter.rateannotation.web;
+package com.blueoptima.ratelimiter.interceptor;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@RequiredArgsConstructor
-public final class RateLimiterWebMvcConfigurer implements WebMvcConfigurer {
+import lombok.RequiredArgsConstructor;
 
-    private final RateCheckInterceptor rateCheckInterceptor;
+@RequiredArgsConstructor
+public final class RateLimiterInterceptorConfigurer implements WebMvcConfigurer {
+
+    private final RateLimiterInterceptor rateCheckInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

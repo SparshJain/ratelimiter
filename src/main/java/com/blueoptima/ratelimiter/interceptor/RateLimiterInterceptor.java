@@ -1,4 +1,4 @@
-package com.blueoptima.ratelimiter.rateannotation.web;
+package com.blueoptima.ratelimiter.interceptor;
 
 import java.lang.reflect.Method;
 import java.util.Enumeration;
@@ -9,8 +9,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -25,21 +23,21 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.blueoptima.ratelimiter.rateannotation.Limiter;
-import com.blueoptima.ratelimiter.rateannotation.RedisProperties;
-import com.blueoptima.ratelimiter.rateannotation.UserBasedConfiguration;
-import com.blueoptima.ratelimiter.rateannotation.core.RateCheckCallableTask;
-import com.blueoptima.ratelimiter.rateannotation.dynamic.DynamicLimiter;
-import com.blueoptima.ratelimiter.rateannotation.dynamic.LimiterConfig;
-import com.blueoptima.ratelimiter.rateannotation.dynamic.ReddisProcessor;
-import com.blueoptima.ratelimiter.rateannotation.event.RateExceedingEvent;
+import com.blueoptima.ratelimiter.annotations.GenericLimit;
+import com.blueoptima.ratelimiter.annotations.SpecificLimit;
+import com.blueoptima.ratelimiter.common.RateCheckCallableTask;
+import com.blueoptima.ratelimiter.common.SpecificConfiguration;
+import com.blueoptima.ratelimiter.common.UserBasedConfiguration;
+import com.blueoptima.ratelimiter.listener.RateExceedingEvent;
+import com.blueoptima.ratelimiter.reddis.ReddisProcessor;
+import com.blueoptima.ratelimiter.reddis.RedisProperties;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 @Configuration
-public class RateCheckInterceptor implements HandlerInterceptor, ApplicationContextAware {
+public class RateLimiterInterceptor implements HandlerInterceptor, ApplicationContextAware {
 
 	private final RedisProperties redisLimiterProperties;
 	private final RateCheckCallableTask rateCheckTaskRunner;
@@ -63,17 +61,17 @@ public class RateCheckInterceptor implements HandlerInterceptor, ApplicationCont
 		boolean isSuccess = true;
 		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		Method method = handlerMethod.getMethod();
-		if (method.isAnnotationPresent(Limiter.class)) {
-			isSuccess = handleStatic(method, request, response);
-		} else if (method.isAnnotationPresent(DynamicLimiter.class)) {
-			isSuccess = handleDynamic(method, request, response);
+		if (method.isAnnotationPresent(GenericLimit.class)) {
+			isSuccess = handleGenericLimit(method, request, response);
+		} else if (method.isAnnotationPresent(SpecificLimit.class)) {
+			isSuccess = handleSpecificLimit(method, request, response);
 		}
 		return isSuccess;
 	}
 
-	private boolean handleStatic(Method method, HttpServletRequest request, HttpServletResponse response)
+	private boolean handleGenericLimit(Method method, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		Limiter rateLimiterAnnotation = method.getAnnotation(Limiter.class);
+		GenericLimit rateLimiterAnnotation = method.getAnnotation(GenericLimit.class);
 
 		TimeUnit timeUnit = rateLimiterAnnotation.timeUnit();
 		String path = rateLimiterAnnotation.path();
@@ -87,8 +85,8 @@ public class RateCheckInterceptor implements HandlerInterceptor, ApplicationCont
 			baseVal = eval(baseExp, request);
 		}
 
-		int permits = userBasedConfiguration.getUserBasedPermits().get(baseVal) != null
-				? Integer.valueOf(userBasedConfiguration.getUserBasedPermits().get(baseVal))
+		int permits = userBasedConfiguration.getUserid().get(baseVal) != null
+				? Integer.valueOf(userBasedConfiguration.getUserid().get(baseVal))
 				: rateLimiterAnnotation.permits();
 
 		String rateLimiterKey = redisLimiterProperties.getRedisKeyPrefix() + ":" + path + ":" + baseVal;
@@ -100,23 +98,21 @@ public class RateCheckInterceptor implements HandlerInterceptor, ApplicationCont
 		return isSuccess;
 	}
 
-	private boolean handleDynamic(Method method, HttpServletRequest request, HttpServletResponse response)
+	private boolean handleSpecificLimit(Method method, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		boolean isSuccess = true;
-		String limiterConfigKey = method.getDeclaringClass().getSimpleName() + ":" + method.getName();
-		LimiterConfig limiterConfig = redisLimiterConfigProcessor.get(limiterConfigKey);
+		String limiterConfigKey = method.getDeclaringClass().getSimpleName() + ":" + method.getName()+ ":" + request.getHeader("userid");
+		SpecificConfiguration limiterConfig = redisLimiterConfigProcessor.get(limiterConfigKey);
+		SpecificLimit dynamicLimiterAnnotation = method.getAnnotation(SpecificLimit.class);
 		if (limiterConfig != null) {
-			String baseExp = limiterConfig.getBaseExp();
+			String baseExp = limiterConfig.getBaseExp()!=null?limiterConfig.getBaseExp():dynamicLimiterAnnotation.base();
 			String baseVal = "";
 			if (!"".equals(baseExp)) {
 				baseVal = eval(baseExp, request);
 			}
-			String path = limiterConfig.getPath();
-			if ("".equals(path)) {
-				path = request.getRequestURI();
-			}
+			String path = limiterConfig.getPath()!=null?limiterConfig.getPath():dynamicLimiterAnnotation.path();
 			int permits = limiterConfig.getPermits();
-			String timeUnit = limiterConfig.getTimeUnit();
+			String timeUnit = limiterConfig.getTimeUnit()!=null?limiterConfig.getTimeUnit():dynamicLimiterAnnotation.timeUnit().name();
 			String rateLimiterKey = redisLimiterProperties.getRedisKeyPrefix() + ":" + path + ":" + baseVal;
 			isSuccess = rateCheckTaskRunner.checkRun(rateLimiterKey, TimeUnit.valueOf(timeUnit), permits);
 			if (!isSuccess) {

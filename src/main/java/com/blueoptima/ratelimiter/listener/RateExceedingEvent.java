@@ -1,7 +1,8 @@
-package com.blueoptima.ratelimiter.rateannotation.event;
+package com.blueoptima.ratelimiter.listener;
+
+import org.springframework.context.ApplicationEvent;
 
 import lombok.Data;
-import org.springframework.context.ApplicationEvent;
 
 @Data
 public final class RateExceedingEvent extends ApplicationEvent {

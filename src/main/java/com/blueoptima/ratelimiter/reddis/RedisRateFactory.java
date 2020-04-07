@@ -1,4 +1,4 @@
-package com.blueoptima.ratelimiter.rateannotation.core;
+package com.blueoptima.ratelimiter.reddis;
 
 import java.util.concurrent.TimeUnit;
 

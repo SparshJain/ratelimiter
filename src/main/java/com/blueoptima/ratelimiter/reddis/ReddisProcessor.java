@@ -1,21 +1,16 @@
-package com.blueoptima.ratelimiter.rateannotation.dynamic;
+package com.blueoptima.ratelimiter.reddis;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
-import com.blueoptima.ratelimiter.rateannotation.RedisProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+
+import com.blueoptima.ratelimiter.common.SpecificConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import redis.clients.jedis.Jedis;
@@ -28,7 +23,7 @@ public final class ReddisProcessor extends JedisPubSub implements BeanPostProces
 
     private final RedisProperties redisLimiterProperties;
 
-    private ConcurrentHashMap<String, LimiterConfig> configMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, SpecificConfiguration> configMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterPropertiesSet(){
@@ -98,15 +93,15 @@ public final class ReddisProcessor extends JedisPubSub implements BeanPostProces
     @Override
     public void onMessage(String channel, String message) {
         ObjectMapper objectMapper = new ObjectMapper();
-        LimiterConfig config = null;
+        SpecificConfiguration config = null;
         try {
-            config = objectMapper.readValue(message, LimiterConfig.class);
+            config = objectMapper.readValue(message, SpecificConfiguration.class);
         }
         catch(IOException e) {
             logger.error("read config from message failed. the message content is " + message);
         }
         if(config != null) {
-                String key = config.getControllerName() + ":" + config.getMethodName();
+                String key = config.getControllerName() + ":" + config.getMethodName()+ ":" + config.getUserId();
                 synchronized(this) {
                     if (config.isDeleted()) {
                         configMap.remove(key);
@@ -117,7 +112,7 @@ public final class ReddisProcessor extends JedisPubSub implements BeanPostProces
         }
     }
 
-    public synchronized LimiterConfig get(String key) {
+    public synchronized SpecificConfiguration get(String key) {
         return configMap.get(key);
     }
 

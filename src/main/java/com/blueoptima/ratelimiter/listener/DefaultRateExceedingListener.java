@@ -1,4 +1,4 @@
-package com.blueoptima.ratelimiter.rateannotation.event;
+package com.blueoptima.ratelimiter.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
