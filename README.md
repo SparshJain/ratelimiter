@@ -46,7 +46,7 @@ A sample report is attached as well.
 If we want to update configuration, assign Content-Type as application/json, then excute PUT http://localhost:8888/specificConfig, the request body as below: 
 ``` json
 {
-	"controllerName" : "SpecificController",
+	"controllerName" : "SpecificLimitController",
 	"methodName" : "developerAPI",
 	"userId" : "user2",
 	"permits" : 4

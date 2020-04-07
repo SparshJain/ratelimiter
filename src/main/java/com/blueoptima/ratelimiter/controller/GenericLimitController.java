@@ -10,7 +10,7 @@ import com.blueoptima.ratelimiter.annotations.GenericLimit;
 
 @RestController
 @RequestMapping("/generic")
-public class GenericController {
+public class GenericLimitController {
     
     @GetMapping("/developers")
     @GenericLimit(base = "#Headers['userid']", permits = 2, timeUnit = TimeUnit.MINUTES)

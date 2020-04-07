@@ -49,7 +49,7 @@ public class SpecificTests extends AbstractTest {
 
 		String uri = "/specificConfig";
 		SpecificConfiguration specificConfiguration = new SpecificConfiguration();
-		specificConfiguration.setControllerName("SpecificController");
+		specificConfiguration.setControllerName("SpecificLimitController");
 		specificConfiguration.setMethodName("developerAPI");
 		specificConfiguration.setTimeUnit(TimeUnit.MINUTES.name());
 
@@ -93,7 +93,7 @@ public class SpecificTests extends AbstractTest {
 
 		String uri = "/specificConfig";
 		SpecificConfiguration specificConfiguration = new SpecificConfiguration();
-		specificConfiguration.setControllerName("SpecificController");
+		specificConfiguration.setControllerName("SpecificLimitController");
 		specificConfiguration.setMethodName("developerAPI");
 		specificConfiguration.setTimeUnit(TimeUnit.MINUTES.name());
 
@@ -137,7 +137,7 @@ public class SpecificTests extends AbstractTest {
 
 		String uri = "/specificConfig";
 		SpecificConfiguration specificConfiguration = new SpecificConfiguration();
-		specificConfiguration.setControllerName("SpecificController");
+		specificConfiguration.setControllerName("SpecificLimitController");
 		specificConfiguration.setMethodName("organisationAPI");
 		specificConfiguration.setTimeUnit(TimeUnit.MINUTES.name());
 		
@@ -181,7 +181,7 @@ public class SpecificTests extends AbstractTest {
 
 		String uri = "/specificConfig";
 		SpecificConfiguration specificConfiguration = new SpecificConfiguration();
-		specificConfiguration.setControllerName("SpecificController");
+		specificConfiguration.setControllerName("SpecificLimitController");
 		specificConfiguration.setMethodName("organisationAPI");
 		specificConfiguration.setTimeUnit(TimeUnit.MINUTES.name());
 
@@ -227,7 +227,7 @@ public class SpecificTests extends AbstractTest {
 
 		String uri = "/specificConfig";
 		SpecificConfiguration specificConfiguration = new SpecificConfiguration();
-		specificConfiguration.setControllerName("SpecificController");
+		specificConfiguration.setControllerName("SpecificLimitController");
 		specificConfiguration.setMethodName("organisationAPI");
 		specificConfiguration.setTimeUnit(TimeUnit.MINUTES.name());
 
