@@ -1,7 +1,5 @@
 ### Configuration
 
-For `resources/application.yml` you need to add the following lines.
-
 ``` yaml
 server:
     port: 8888                                #port
@@ -17,7 +15,7 @@ user-based-permits:
 
 ### Start Redis server
 
-Start Redis server on a local machine or with Docker.
+Start Redis server on Docker.
 
 ``` bash
 docker-compose up -d
